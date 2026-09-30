@@ -1,0 +1,48 @@
+name: Prepare Darwin VM firmware
+
+on:
+  workflow_dispatch:
+
+jobs:
+  prepare-firmware:
+    runs-on: macos-15-intel
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install dependencies
+        run: |
+          brew install jq wget ipsw
+
+      - name: Check environment
+        run: |
+          uname -a
+          sw_vers
+          which jq
+          which ipsw
+          ipsw version
+
+      - name: Prepare firmware
+        run: |
+          chmod +x get_files.sh
+          ./get_files.sh
+
+      - name: Fix ramdisk permissions
+        run: |
+          chmod +x fix_perms.sh
+          ./fix_perms.sh firmware/ramdisk.dmg
+
+      - name: Show generated firmware
+        run: |
+          find firmware -maxdepth 1 -type f -print
+          du -sh firmware
+
+      - name: Upload firmware
+        uses: actions/upload-artifact@v4
+        with:
+          name: darwin-vm-firmware
+          path: firmware/
+          retention-days: 7
