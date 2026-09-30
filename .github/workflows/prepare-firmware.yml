@@ -33,7 +33,7 @@ jobs:
       - name: Fix ramdisk permissions
         run: |
           chmod +x fix_perms.sh
-          ./fix_perms.sh firmware/ramdisk.dmg
+          printf 'y\n' | ./fix_perms.sh firmware/ramdisk.dmg
 
       - name: Show generated firmware
         run: |
